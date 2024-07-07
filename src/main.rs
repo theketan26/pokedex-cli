@@ -19,6 +19,9 @@ async fn main() -> Result<(), Error> {
     // 5. Help
 
     match args[1].as_str() {
+        "list" => {
+            let _ = services.get_all_pokemon().await?;
+        },
         "pokemon" => {
             let _ = services.get_pokemon(&(args[2].as_str())).await?;
         },

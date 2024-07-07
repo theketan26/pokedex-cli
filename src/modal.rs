@@ -84,3 +84,12 @@ pub struct Pokemon {
     pub moves: Vec<PokemonMove>,
     pub types: Vec<PokemonType>,
 }
+
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PokemonList {
+    pub count: usize,
+    pub next: Option<String>,
+    pub previous: Option<String>,
+    pub results: Vec<Name>,
+}

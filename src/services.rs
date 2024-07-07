@@ -1,7 +1,8 @@
+use std::io::stdin;
 use reqwest::{ get, Error };
 use serde_json::from_str;
 
-use crate::modal::Pokemon;
+use crate::modal::{ Pokemon, PokemonList };
 
 
 pub struct Services {
@@ -26,6 +27,71 @@ impl Services {
                 
             },
             Err(err) => println!("Faced an error: {}", err)
+        }
+        Ok(())
+    }
+
+    pub async fn get_all_pokemon(&self) -> Result<(), Error> {
+        let mut url = format!("{url}/pokemon", url = self.url);
+        let mut running = true;
+
+        loop {
+            if !running { break };
+
+            let res = get(format!("{url}")).await;
+            match res {
+                Ok(response) => {
+                    let res_text: &str = &response.text().await?;
+                    let res_json: PokemonList;
+    
+                    if res_text == "Not Found" {
+                        println!("Could not list pokemons.");
+                        panic!();
+                    } else {
+                        res_json = from_str(&res_text).unwrap();
+                        println!("{:#?}", res_json);
+                    }
+                    
+                    let mut input = String::new();
+                    loop {
+                        println!("Enter:\n1: Next pokemons\n2: Previous pokemons\n0: To exit");
+
+                        let _ = stdin().read_line(&mut input).unwrap();
+
+                        match input.as_str().trim() {
+                            "1" => {
+                                let next_url = res_json.next.clone();
+                                if next_url.is_none() {
+                                    println!("No more pokemons to display.");
+                                    input.clear();
+                                    continue;
+                                }
+                                url = next_url.unwrap();
+                                break;
+                            }, 
+                            "2" => {
+                                let prev_url = res_json.previous.clone();
+                                if prev_url.is_none() {
+                                    println!("No previous pokemons to display.");
+                                    input.clear();
+                                    continue;
+                                }
+                                url = prev_url.unwrap();
+                                break;
+                            },
+                            "0" => {
+                                println!("Exiting the Pokedex.");
+                                running = false;
+                                break;
+                            },
+                            _ => {
+                                println!("Invalid input!")
+                            }
+                        } 
+                    }
+                },
+                Err(err) => println!("Faced an error: {}", err)
+            }
         }
         Ok(())
     }
