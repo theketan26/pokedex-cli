@@ -1,42 +1,45 @@
 mod modal;
 mod services;
 
-use std::env::args;
+use std::io::stdin;
 use reqwest::Error;
 use services::Services;
 
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let args: Vec<String> = args().collect();
+    println!("\nWelcome to the CLI Pokedex!");
+
     let services = Services{ url: String::from("https://pokeapi.co/api/v2") };
 
-    // TODO:
-    // 1. List all pokemons - done
-    // 2. Details of moves - done
-    // 3. Search pokemon
-    // 4. Move details - done
-    // 5. Help
+    let mut input = String::new();
+    loop {
+        println!("1.\tList All Pokemons\n2.\tList All Moves\n3.\tList All Types\n4.\tSearch by name\n0.\tExit\nEnter your choice..");
+        stdin().read_line(&mut input).unwrap();
 
-    match args[1].as_str() {
-        "list" => {
-            let _ = services.get_all_pokemon().await?;
-        },
-        "move" => {
-            let _ = services.get_all_move().await?;
-        },
-        "type" => {
-            let _ = services.get_all_type().await?;
-        },
-        "pokemon" => {
-            let _ = services.get_pokemon(&(args[2].as_str())).await?;
-        },
-        "search" => {
-            let _ = services.search_pokemon(&(args[2].as_str())).await?;
-        },
-        _ => {
-            println!("{} is not a valid command", args[1]);
+        match input.as_str().trim() {
+            "1" => {
+                let _ = services.get_all_pokemon().await?;
+            },
+            "2" => {
+                let _ = services.get_all_move().await?;
+            },
+            "3" => {
+                let _ = services.get_all_type().await?;
+            },
+            "4" => {
+                let _ = services.search_pokemon().await?;
+            },
+            "0" => {
+                break;
+            },
+            _ => {
+                println!("{} is not a valid command", input);
+            }
         }
+
+        input.clear()
     }
+
     Ok(())
 }
