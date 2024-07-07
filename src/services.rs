@@ -1,6 +1,7 @@
 use std::io::stdin;
 use reqwest::{ get, Error };
 use serde_json::from_str;
+use strsim::jaro;
 
 use crate::modal::{ Pokemon, PokemonList };
 
@@ -173,6 +174,29 @@ impl Services {
                 Err(err) => println!("Faced an error: {}", err)
             }
         }
+        Ok(())
+    }
+
+    pub async fn search_pokemon(&self, pokemon: &str) -> Result<(), Error> {
+        let res = get(format!("{url}/pokemon/?limit=9999", url = self.url)).await;
+        
+        match res {
+            Ok(response) => {
+                let res_text: &str = &response.text().await?;
+                let res_json: PokemonList = from_str(res_text).unwrap();
+
+                for pokemon_name in res_json.results.into_iter() {
+                    let similarity = jaro(pokemon, &pokemon_name.name);
+                    if similarity > 0.8 {
+                        println!("{:#?}", pokemon_name);
+                    }
+                }
+            },
+            Err(err) => {
+                println!("Faced an error: {}", err);
+            }
+        }
+
         Ok(())
     }
 }

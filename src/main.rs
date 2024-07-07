@@ -13,9 +13,9 @@ async fn main() -> Result<(), Error> {
 
     // TODO:
     // 1. List all pokemons - done
-    // 2. Details of moves
+    // 2. Details of moves - done
     // 3. Search pokemon
-    // 4. Move details
+    // 4. Move details - done
     // 5. Help
 
     match args[1].as_str() {
@@ -30,6 +30,9 @@ async fn main() -> Result<(), Error> {
         },
         "pokemon" => {
             let _ = services.get_pokemon(&(args[2].as_str())).await?;
+        },
+        "search" => {
+            let _ = services.search_pokemon(&(args[2].as_str())).await?;
         },
         _ => {
             println!("{} is not a valid command", args[1]);
