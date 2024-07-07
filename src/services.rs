@@ -31,6 +31,21 @@ impl Services {
         Ok(())
     }
     
+    pub async fn get_all_type(&self) -> Result<(), Error> {
+        let res = get(format!("{url}/type", url = self.url)).await;
+        
+        match res {
+            Ok(response) => {
+                let res_text: &str = &response.text().await?;
+
+                let res_json: PokemonList = from_str(&res_text).unwrap();
+                println!("{:#?}", res_json);
+            },
+            Err(err) => println!("Faced an error: {}", err)
+        }
+        Ok(())
+    }
+    
     pub async fn get_all_move(&self) -> Result<(), Error> {
         let mut url = format!("{url}/move", url = self.url);
         let mut running = true;

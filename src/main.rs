@@ -25,6 +25,9 @@ async fn main() -> Result<(), Error> {
         "move" => {
             let _ = services.get_all_move().await?;
         },
+        "type" => {
+            let _ = services.get_all_type().await?;
+        },
         "pokemon" => {
             let _ = services.get_pokemon(&(args[2].as_str())).await?;
         },
